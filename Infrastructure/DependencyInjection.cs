@@ -1,4 +1,6 @@
-﻿using Infrastructure.Repository;
+﻿using Domain.Interfaces;
+using Infrastructure.Databases.SqlServer;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,9 +23,9 @@ public static class DependencyInjection
             configuration.GetConnectionString("SqlServer") ??
             throw new ArgumentNullException(nameof(configuration));
 
-        // services.AddDbContext<SqlContext>(
-        //     options => options.UseSqlServer(sqlConnection,
-        //     option => option.UseCompatibilityLevel(120)));
+        services.AddDbContext<SqlContext>(
+            options => options.UseSqlServer(sqlConnection,
+            option => option.UseCompatibilityLevel(120)));
 
         // Register repositories
         //var assembly = Assembly.GetExecutingAssembly();
@@ -44,6 +46,6 @@ public static class DependencyInjection
         //    }
         //}
 
-        // services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
     }
 }
