@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 var _config = config.GetSection(nameof(AppSettings)).Get<AppSettings>()!;
 builder.Services.AddSingleton(_config);
+builder.AddAAAAuthentication();
 
 var assembly = typeof(Program).Assembly;
 builder.Services.AddSwagger();
@@ -20,14 +21,15 @@ builder.Services.AddCarter();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Host.UseSerilog((context, configuration) =>
-{
-    configuration.ReadFrom
-    .Configuration(context.Configuration)
-    .Enrich
-    .FromLogContext()
-    .WriteTo.Console();
-});
+builder.Host.UseSerilog(
+    (context, configuration) =>
+    {
+        configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .Enrich.FromLogContext()
+            .WriteTo.Console();
+    }
+);
 
 var app = builder.Build();
 
@@ -38,6 +40,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionHandling>();
+app.UseAAAAuthentication();
 app.MapCarter();
 app.UseHttpsRedirection();
 app.Run();
