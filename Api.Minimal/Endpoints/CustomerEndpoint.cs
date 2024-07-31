@@ -1,9 +1,9 @@
-﻿using Application.Customer.Commands.Create;
-using Application.Customer.Commands.Delete;
-using Application.Customer.Commands.Update;
-using Application.Customer.Queries.GetById;
-using Application.Customer.Queries.Inquiry;
-using Microsoft.AspNetCore.Authorization;
+using Application.Customer.Create;
+using Application.Customer.Dapper;
+using Application.Customer.Delete;
+using Application.Customer.GetById;
+using Application.Customer.Inquiry;
+using Application.Customer.Update;
 
 namespace Api.Minimal.Endpoints;
 
@@ -13,53 +13,60 @@ public class CustomerEndpoint : CarterModule
         : base("customer")
     {
         WithTags("Customer");
-        this.RequireAuthorization();
     }
 
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost(
-                "/Create",
-                async (ISender sender, CreateCustomerCommand req) =>
-                {
-                    var result = await sender.Send(req);
-                    return result;
-                }
-            )
-            .AllowAnonymous();
-
-        app.MapPost(
-            "/Update",
-            async (ISender sender, UpdateCustomerCommand req) =>
+            "/Create",
+            async (ISender sender, CustomerCreateCommand req, CancellationToken token) =>
             {
-                var result = await sender.Send(req);
+                var result = await sender.Send(req, token);
                 return result;
             }
         );
 
-        app.MapPost(
-            "/Delete",
-            async (ISender sender, DeleteCustomerCommand req) =>
+        app.MapPut(
+            "/Update",
+            async (ISender sender, CustomerUpdateCommand req, CancellationToken cancellationToken) =>
             {
-                var result = await sender.Send(req);
+                var result = await sender.Send(req, cancellationToken);
+                return result;
+            }
+        );
+
+        app.MapDelete(
+            "/Delete{id}",
+            async (ISender sender, Guid id, CancellationToken token) =>
+            {
+                var result = await sender.Send(new CustomerDeleteCommand(id), token);
                 return result;
             }
         );
 
         app.MapGet(
             "/GetById/{id}",
-            async (ISender sender, Guid id) =>
+            async (ISender sender, Guid id, CancellationToken token) =>
             {
-                var result = await sender.Send(new GetCustomerByIdQuery(id));
+                var result = await sender.Send(new CustomerGetByIdQuery(id), token);
                 return result;
             }
         );
 
         app.MapPost(
             "/Inquiry",
-            async (ISender sender, InquiryCustomerQuery req) =>
+            async (ISender sender, CustomerInquiryQuery req, CancellationToken token) =>
             {
-                var result = await sender.Send(req);
+                var result = await sender.Send(req, token);
+                return result;
+            }
+        );
+
+        app.MapPost(
+            "/Demo_EfCore_Dapper",
+            async (ISender sender, CustomerDapperHandlerQuery req, CancellationToken token) =>
+            {
+                var result = await sender.Send(req, token);
                 return result;
             }
         );

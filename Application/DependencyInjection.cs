@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Behaviors;
+using Application.Abstractions.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -12,8 +12,8 @@ public static class DependencyInjection
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(assembly);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
+            config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(assembly);
